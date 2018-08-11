@@ -65,6 +65,7 @@ int getFactors(long long x)
 
 int main()
 {
+    freopen("1.out","w",stdout);
     getPrime();
     int t;
     int n;
