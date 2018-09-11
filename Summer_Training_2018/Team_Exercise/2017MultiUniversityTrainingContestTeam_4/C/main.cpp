@@ -9,7 +9,6 @@
 #include <utility>
 #include <algorithm>
 #include <ctime>
-#define MAXN 10000
 #define INF 0x3f3f3f3f
 #define DEBUG
 #define DataIn
@@ -17,13 +16,18 @@ typedef long long LL;
 
 using namespace std;
 
-int prime[MAXN+1];
-const int MOD = 998244353;
+const int MAXN = 1e6+7;
+LL prime[MAXN+1];
+LL num[MAXN+1];
+LL a[MAXN];
+
+const LL MOD = 998244353;
+LL l, r, k;
 
 void getPrime()
 {
     memset(prime, 0, sizeof(prime));
-    for(int i=2; i<MAXN; i++)
+    for(int i=2; i<=MAXN; i++)
     {
         if(!prime[i])
             prime[++prime[0]] = i;
@@ -36,61 +40,51 @@ void getPrime()
     }
 }
 
-long long factor[100][2];
-int fatCnt;
-int getFactors(long long x)
+void process()
 {
-    fatCnt = 0;
-    long long tmp = x;
+    LL p, cnt;
 
-    for(int i=1; prime[i]<=tmp/prime[i]; i++)
+    for(LL i=1; i<=prime[0] && prime[i] * prime[i]<=r; i++)
     {
-        factor[fatCnt][1] = 0;
-        if(tmp%prime[i]==0)
+        p = prime[i];
+        for(LL j=(l+p-1)/p*p; j<=r; j+=p)
         {
-            factor[fatCnt][0] = prime[i];
-            while(tmp%prime[i] == 0)
+            cnt = 0;
+            while((a[j-l]%p==0) )
             {
-                factor[fatCnt][1] ++;
-                tmp /= prime[i];
+                cnt++;
+                a[j-l] /= p;
             }
-            fatCnt++;
+
+            num[j-l] = (num[j-l] * ((k*cnt + 1) % MOD)) % MOD;
         }
     }
-
-    if(tmp != 1)
-    {
-        factor[fatCnt][0] = tmp;
-        factor[fatCnt++][1] = 1;
-    }
-    return fatCnt;
 }
 
-//get pow(x, k) factors count
-int getFactorNum(LL x, int k)
-{
-    int cnt = getFactors(x);
-    int ret = 1;
-    for(int i=0; i<cnt; i++)
-    {
-        ret = (ret * (factor[i][1]*k+1)%MOD) % MOD;
-    }
-    return ret;
-}
 
 int main()
 {
     getPrime();
     int T;
     scanf("%d", &T);
-    int l, r, k;
     while(T--)
     {
-        scanf("%d%d%d", &l, &r, &k);
-        int ans = 0;
-        for(int i=l; i<=r; i++)
-            ans = ans + (getFactorNum(i, k) % MOD) % MOD;
-        printf("%d\n", ans);
+        scanf("%I64d%I64d%I64d", &l, &r, &k);
+        int len = r-l+1;
+        for(int i=0; i<len; i++)
+        {
+            a[i] = l+i;
+            num[i] = 1;
+        }
+        process();
+        LL ans = 0;
+        for(LL i=l; i<=r; i++)
+        {
+            if(a[i-l] > 1)
+                num[i-l] = num[i-l] * (k+1) % MOD;
+            ans = (ans + num[i-l]) %MOD;
+        }
+        printf("%I64d\n", ans);
     }
     return 0;
 }
