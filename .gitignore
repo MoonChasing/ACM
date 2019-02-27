@@ -1,0 +1,9 @@
+# 忽略生成的exe 
+*.exe
+
+*.o
+
+#忽略 Code::Blocks 工程文件
+*.cbp
+*.depend
+*.layout
